@@ -8,7 +8,7 @@ from .token import create_jwt
 
 class RegisterView(generics.GenericAPIView):
     serializer_class = UserAuthSerializer
-
+    permission_classes = []
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -17,6 +17,7 @@ class RegisterView(generics.GenericAPIView):
 
 
 class LoginView(generics.GenericAPIView):
+    permission_classes = []
 
     def post(self, request):
         email = request.data.get('email')
