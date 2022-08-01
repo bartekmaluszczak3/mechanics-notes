@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user_auth',
     'cars',
+    'notes',
     'rest_framework',
     'rest_framework.authtoken'
 ]

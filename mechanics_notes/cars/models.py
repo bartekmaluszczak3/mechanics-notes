@@ -16,5 +16,6 @@ class Car(models.Model):
             "model": self.model,
             "year": self.year,
             "id": self.id,
-            "user_id": self.user.id
+            "user_id": self.user.id,
+            "notes": [note.as_json() for note in self.note_set.all()]
         }

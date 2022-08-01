@@ -5,7 +5,7 @@ from rest_framework.permissions import (
 )
 from rest_framework.request import Request
 
-from .permission import AuthorOrReadOnly
+from mechanics_notes.permission import AuthorOrReadOnly
 from .models import Car
 from .serializers import CarSerializer
 
@@ -20,29 +20,26 @@ class PostCarAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Crea
         serializer = CarSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         car = serializer.save()
-        return JsonResponse(car, status=status.HTTP_200_OK)
+        return JsonResponse(car.as_json(), status=status.HTTP_200_OK)
 
 
-class GetSingleCarAPIView(generics.GenericAPIView, mixins.RetrieveModelMixin):
+class GetSingleCarAPIView(generics.GenericAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
     permission_classes = [AuthorOrReadOnly]
 
-    def get(self, request: Request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+    def get(self, request, pk):
+        car = Car.objects.filter(id=pk).first()
+        return JsonResponse(car.as_json(), status=status.HTTP_200_OK)
 
 
-class GetAllCarsAPIView(generics.GenericAPIView, mixins.ListModelMixin):
+class GetAllCarsAPIView(generics.GenericAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Car.objects.all()
     serializer_class = CarSerializer
 
-
-    def get_queryset(self):
-        user = self.request.user or None
-        if user:
-            return Car.objects.filter(user__email=user)
-        return self.queryset
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def get(self, request):
+        user = request.user
+        query_cars = Car.objects.filter(user__email=user)
+        cars = [car.as_json() for car in query_cars]
+        return JsonResponse(cars, status=status.HTTP_200_OK, safe=False)
