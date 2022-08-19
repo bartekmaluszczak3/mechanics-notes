@@ -5,7 +5,6 @@ from rest_framework.permissions import (
 )
 from rest_framework.request import Request
 
-from mechanics_notes.permission import AuthorOrReadOnly
 from .models import Car
 from .serializers import CarSerializer
 
@@ -20,16 +19,18 @@ class PostCarAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Crea
         serializer = CarSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         car = serializer.save()
-        return JsonResponse(car.as_json(), status=status.HTTP_200_OK)
+        return JsonResponse(car, status=status.HTTP_200_OK)
 
 
 class GetSingleCarAPIView(generics.GenericAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
-    permission_classes = [AuthorOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, pk):
         car = Car.objects.filter(id=pk).first()
+        if car.user.id != self.request.user.id:
+            return JsonResponse("You dont have permission for this object", status=status.HTTP_403_FORBIDDEN, safe=False)
         return JsonResponse(car.as_json(), status=status.HTTP_200_OK)
 
 

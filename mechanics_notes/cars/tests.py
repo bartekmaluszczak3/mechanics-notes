@@ -27,6 +27,7 @@ class CarApiTest(APITestCase):
         self.assertTrue(response.json()['brand'])
         self.assertTrue(response.json()['model'])
         self.assertTrue(response.json()['year'])
+        self.assertEqual([], response.json()['notes'])
 
     def test_user_has_access_to_his_car(self):
         self.authenticate("test_email", "asdasdsdasda")
