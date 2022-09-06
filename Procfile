@@ -1,0 +1,1 @@
+web: gunicorn mechanics_notes.wsgi --log-file -
